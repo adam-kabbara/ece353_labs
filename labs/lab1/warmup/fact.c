@@ -8,8 +8,14 @@ int factorial(int in){
 int main(int argc, char* argv[])
 {	
 	
-	int arg_i = atoi(argv[1]);
-	if (argc == 1 || arg_i<=0){ // if no arg, negative
+	if (argc == 1){ // if no arg, negative
+		printf("Huh?\n");
+		return 0;
+	}
+
+	int arg_i = atoi(argv[1]); // this make more sense here. idk how it works on windows b4
+
+	if (arg_i<=0){
 		printf("Huh?\n");
 		return 0;
 	}
@@ -29,6 +35,7 @@ int main(int argc, char* argv[])
 	}
 
 	// if bigger than 12 return Overflow
+	// have this down here to catch cases like 12. or 10d etc...
 	if (arg_i > 12){ 
 		printf("Overflow\n");
 		return 0;
