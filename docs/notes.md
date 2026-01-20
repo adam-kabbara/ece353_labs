@@ -243,4 +243,24 @@ For more info you can review the ECE358 notes or check out [this resource](https
 
 In lab1, I use chaining to resolve collisions while using [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) hash function to hash strings into indices. FNV was chosen cause saw that python used to use it as its hash functions a few generations ago, and it is simple to implement.
 
+It's a good rule of thumb to have the hashtable size be double the expected number of elements to be stored in it, to reduce collisions and maintain efficient operations. Although not implemented in lab1, resizing the hashtable when the load factor (number of elements / size of table) exceeds a certain threshold (commonly 0.7) is a common practice to maintain performance. To do this you must rehash all existing keys into the new larger table tho.
+
 ![alt text](imgs/image-2.png)
+
+
+### Datatype reminder
+In my current system (linux)
+|Datatype | Size (bytes) | Default Value |
+|---------|---------------|----------------|
+ints    | 4             | 0              |
+float   | 4             | 0.0            |
+double  | 8             | 0.0            |
+char    | 1             | '\0'           |
+pointer | 8             | NULL           |
+long    | 8             | 0              |
+long long | 8         | 0              |
+
+You can check the size of datatypes in your system using the `sizeof` operator in C. For example:
+```c
+printf("Size of int: %zu bytes\n", sizeof(int));
+```
