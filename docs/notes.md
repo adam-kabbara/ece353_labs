@@ -23,3 +23,54 @@ Example for a simple C program:
 ![alt text](image-1.png)
 
 Makefile echoes each command before executing it. Make executes every specified target-rule in the file. If no target-rule specified, make executes the first target in the file.
+
+### Notes
+The make command in linux can run without a makefile if you provide it with a target. For example `make hello` will compile hello.c into an executable called hello using default rules. However, it is best practice to always include a makefile for larger projects. 
+
+You can see these default implicit rules by running `make -p` in the terminal. For C it looks something like this:
+
+```Makefile
+.c:
+    $(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
+.o:
+    $(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+```
+
+these rules say that to make a .c file into an executable, use the command `$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@` where `$^` is all the prerequisites and `$@` is the target. Similarly for .o files. The variables like `$(LINK.c)` are defined elsewhere in the make program. These vars hold the gcc commands with flags.
+
+### Lab1 makefile
+```
+CFLAGS := -g -Wall -Werror
+LOADLIBES := -lm
+#TARGETS := hi hello words fact test_point test_sorted_points test_wc
+TARGETS := hi hello words fact test_point test_wc cpr
+
+# Make sure that 'all' is the first target
+all: depend $(TARGETS)
+
+clean:
+	rm -rf core *.o $(TARGETS)
+
+realclean: clean
+	rm -rf *~ *.bak .depend *.log *.out
+
+tags:
+	etags *.c *.h
+
+test_point: point.o
+
+#test_sorted_points: point.o sorted_points.o
+
+cpr: cpr.o
+
+test_wc: wc.o
+
+depend:
+	$(CC) -MM *.c > .depend
+
+ifeq (.depend,$(wildcard .depend))
+include .depend
+endif
+```
+
+Here you do not see a rule for compiling .c files into executables because it uses the implicit rules mentioned above. This make file just declares the relationships between files. For example, `test_point: point.o` says that to make the executable test_point, point.o is needed. The rest is handled by the implicit rules. The `depend` rule generates a list of dependencies for all .c files and stores them in a file called .depend which is then included at the bottom of the makefile. This way if a .h file changes, all .c files that include it will be recompiled.
