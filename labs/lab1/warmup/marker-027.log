@@ -1,0 +1,8 @@
+tar: /cad2/ece353s/src/warmup.tar: Cannot open: Permission denied
+tar: Error is not recoverable: exiting now
+remote: fatal: '/srv/ece353s/ss-027/ece353' does not appear to be a git repository        
+remote: git upload-archive: archiver died with error
+fatal: sent error to the client: git upload-archive: archiver died with error
+tar: This does not look like a tar archive
+tar: Exiting with failure status due to previous errors
+git checkout was not successful
