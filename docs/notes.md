@@ -75,6 +75,59 @@ endif
 
 Here you do not see a rule for compiling .c files into executables because it uses the implicit rules mentioned above. This make file just declares the relationships between files. For example, `test_point: point.o` says that to make the executable test_point, point.o is needed. The rest is handled by the implicit rules. The `depend` rule generates a list of dependencies for all .c files and stores them in a file called .depend which is then included at the bottom of the makefile. This way if a .h file changes, all .c files that include it will be recompiled.
 
+### Hands on Makefile example
+header.h
+```c
+#define DOG "doggo"
+```
+mm.c
+```c
+#include <stdio.h>
+#include "header.h"
+void main() {
+    printf("Hello %s\n", DOG);
+}
+```
+now running `make mm` will compile mm.c into an executable called mm. If you run `./mm` it will print "Hello doggo". We learn that if we just including a header files into `.c` files, these just provide declarations (and macros and function definitions) so we do not need to link anything extra.
+```bash
+$ make mm
+cc     mm.c   -o mm
+$ ./mm
+Hello doggo
+```
+
+But now if we change `header.h` to:
+```c
+#define DOG "doggo"
+
+int five();
+```
+and add a new file `header.c`:
+```c  
+#include "header.h"
+int five() {
+    return 5;
+}
+```
+and change `mm.c` to:
+```c
+#include <stdio.h>
+#include "header.h"
+void main() {
+    printf("Hello %s %d\n", DOG, five());
+}
+```
+Now if we run `make mm` again, it will fail because the linker cannot find the definition of `five()`. We need to tell the makefile that `mm` depends on `header.o` as well. So we change the makefile to:
+```Makefile
+mm: mm.o header.o # if mm.o or header.o changes, recompile mm
+mm.o: mm.c header.h # if mm.c or header.h changes, recompile mm.o
+header.o: header.c header.h # if header.c or header.h changes, recompile header.o
+clean:
+    rm -f mm *.o # remove all object files and executables when cleaning
+```
+remeber we dont need to specify how to compile .c files into .o files or how to link .o files into executables because make has implicit rules for that. Now running `make mm` will work.
+
+
 ## Structs and Malloc reveiew
 A struct is a user-defined data type in C that allows you to group related variables of different types together. It is similar to a class in object-oriented programming, but it does not have methods or access control.
 Here is an example of a struct definition and usage:
