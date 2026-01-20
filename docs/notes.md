@@ -1,4 +1,4 @@
-# Getting started notes
+# Lab1 Notes
 ## Makefile
 checkout [Makefile tutorial](https://makefiletutorial.com/) and the [cook book](https://makefiletutorial.com/#makefile-cookbook)
 
@@ -74,3 +74,107 @@ endif
 ```
 
 Here you do not see a rule for compiling .c files into executables because it uses the implicit rules mentioned above. This make file just declares the relationships between files. For example, `test_point: point.o` says that to make the executable test_point, point.o is needed. The rest is handled by the implicit rules. The `depend` rule generates a list of dependencies for all .c files and stores them in a file called .depend which is then included at the bottom of the makefile. This way if a .h file changes, all .c files that include it will be recompiled.
+
+## Structs and Malloc reveiew
+A struct is a user-defined data type in C that allows you to group related variables of different types together. It is similar to a class in object-oriented programming, but it does not have methods or access control.
+Here is an example of a struct definition and usage:
+
+```c
+struct Point {
+    int x;
+    int y;
+};
+struct Point p1; // declare a variable of type struct Point
+p1.x = 10; // access and modify the members of the struct
+p1.y = 20;
+```
+
+You can use the `typedef` keyword to create an alias for a struct type, making it easier to use:
+
+```c
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+Point p1; // declare a variable of type Point
+p1.x = 10; // access and modify the members of the struct
+p1.y = 20;
+```
+
+To edit struct values you can use the dot operator (.) to access the members of the struct, like above. If you have a pointer to a struct, you can use the arrow operator (->) to access the members.
+```c
+Point *p2 = &p1; // declare a pointer to a Point struct
+p2->x = 30; // access and modify the members of the struct using the pointer
+(*p2).y = 40; // alternative way to access members using the pointer
+```
+
+If you do not know the size of the struct at compile time, you can use `malloc` to dynamically allocate memory for it at runtime. Here is an example:
+
+```c
+Point *p3 = (Point *)malloc(sizeof(Point)); // dynamically allocate memory for a Point struct
+p3->x = 50; // access and modify the members of the struct using the pointer
+p3->y = 60;
+```
+
+If you have a struct that contains an array as follow:
+```c
+typedef struct {
+    int size;
+    int *data;
+} IntArray;
+```
+There are two ways to allocate memory for the array member `data`:
+1. Store both the struct and the array on the heap:
+```c
+IntArray *arr = (IntArray *)malloc(sizeof(IntArray)); // allocate memory for the struct
+arr->size = 10;
+arr->data = (int *)malloc(arr->size * sizeof(int)); // allocate memory for the array
+``` 
+2. Store the struct on the stack and the array on the heap:
+```c
+IntArray arr; // declare a variable of type IntArray on the stack
+arr.size = 10;
+arr.data = (int *)malloc(arr.size * sizeof(int)); // allocate memory for the array on the heap
+```
+Method 1 is useful when you need to pass the struct around as a pointer, but you need to free both struct and arr now. 
+Method 2 is simpler when you only need the struct in a local scope, you only need to free arr now, but cannot pass struct around as a pointer.
+
+## Union
+A union is a user-defined data type in C that allows you to store different data types in the same memory location. It is similar to a struct, but all members of a union share the same memory space. This means that only one member can hold a value at any given time, and the size of the union is determined by the size of its largest member.
+
+```c
+union Data {
+    int i;
+    float f;
+    char str[20];
+};
+union Data data; // declare a variable of type union Data
+data.i = 10; // assign a value to the integer member
+printf("data.i: %d\n", data.i); // access the integer member
+data.f = 220.5; // assign a value to the float member
+printf("data.f: %f\n", data.f); // access the float member
+strcpy(data.str, "Hello World"); // assign a value to the string member
+printf("data.str: %s\n", data.str); // access the string member
+```
+
+## Memmory Management
+Reminder that variable declaration is when you do not assign a value to a variable, while variable definition is when you do assign a value. In both instances memory is allocated in the **stack**.
+
+To assign memory in the **heap**, you need to use dynamic memory allocation functions like `malloc`, `calloc`, or `realloc`. These functions allocate memory at runtime and return a pointer to the allocated memory.
+1. `malloc(size_t size)`: Allocates a block of memory of the specified size (in bytes) and returns a void pointer (that must be type casted) to the beginning of the block. The contents of the allocated memory are uninitialized.
+```c
+int *arr = (int *)malloc(10 * sizeof(int)); // allocate memory for an array of 10 integers
+```
+2. `calloc(size_t num, size_t size)`: Allocates memory for an array of `num` elements, each of the specified size (in bytes), and initializes all bytes to zero. It returns a pointer to the beginning of the block.
+```c
+int *arr = (int *)calloc(10, sizeof(int)); // allocate memory for an array of 10 integers and initialize to zero
+```
+3. `realloc(void *ptr, size_t size)`: Resizes the memory block pointed to by `ptr` to the new size (in bytes). It may move the memory block to a new location if necessary and returns a pointer to the resized memory block.
+```c
+arr = (int *)realloc(arr, 20 * sizeof(int)); // resize the array to hold 20 integers
+```
+
+When you use `malloc`, `calloc`, or `realloc` to allocate memory, it is important to free that memory using the `free` function when you are done using it. Failing to do so can lead to memory leaks, which can cause your program to run out of memory over time.
+
+[Here](https://www.geeksforgeeks.org/c/dynamic-memory-allocation-in-c-using-malloc-calloc-free-and-realloc/) is a good resource for more information on dynamic memory allocation in C.
