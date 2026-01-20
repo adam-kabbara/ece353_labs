@@ -25,6 +25,7 @@ int main(int argc, char* argv[])
 			printf("Huh?\n");
 			return 0;
 		}
+		i++;
 	}
 
 	// if bigger than 12 return Overflow
