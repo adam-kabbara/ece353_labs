@@ -227,6 +227,7 @@ int *arr = (int *)calloc(10, sizeof(int)); // allocate memory for an array of 10
 ```c
 arr = (int *)realloc(arr, 20 * sizeof(int)); // resize the array to hold 20 integers
 ```
+Also note that it is totally legal to `realloc` a NULL pointer, in which case it behaves like `malloc`.
 
 When you use `malloc`, `calloc`, or `realloc` to allocate memory, it is important to free that memory using the `free` function when you are done using it. Failing to do so can lead to memory leaks, which can cause your program to run out of memory over time.
 
@@ -264,3 +265,5 @@ You can check the size of datatypes in your system using the `sizeof` operator i
 ```c
 printf("Size of int: %zu bytes\n", sizeof(int));
 ```
+
+`size_t` is an unsigned integer type that is used to represent the size of objects in bytes and also indices. It is the type returned by the `sizeof` operator and is defined in the `<stddef.h>` header file. The actual size of `size_t` may vary depending on the platform and architecture, but it is guaranteed to be able to represent the size of any object that can be allocated in memory.

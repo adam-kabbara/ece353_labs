@@ -35,6 +35,20 @@ int hash_index(struct hashtable* ht, char* k){
 	return hash(k) % ht->size;
 }
 
+int get_kvp_value(struct hashtable* ht, char* k){
+	struct key_val_pair* kvp = &(ht->kvp_arr[hash_index(ht, k)]);
+	if (kvp->used == 0){
+		return -1;
+	}
+	while (strcmp(kvp->key, k) != 0 && kvp->next != NULL){ // keep going through linked list till u find value, or reach end
+		kvp = kvp->next;
+	}
+	if (strcmp(kvp->key, k) == 0 ){
+		return kvp->val;
+	}
+	return -1;
+}
+
 int add_kvp(struct hashtable* ht, char *k, int v){
 	struct key_val_pair* kvp = &(ht->kvp_arr[hash_index(ht, k)]);
 	if (get_kvp_value(ht, k) == -1){
@@ -56,20 +70,6 @@ int add_kvp(struct hashtable* ht, char *k, int v){
 		}
 		return 0;
 
-	}
-	return -1;
-}
-
-int get_kvp_value(struct hashtable* ht, char* k){
-	struct key_val_pair* kvp = &(ht->kvp_arr[hash_index(ht, k)]);
-	if (kvp->used == 0){
-		return -1;
-	}
-	while (strcmp(kvp->key, k) != 0 && kvp->next != NULL){ // keep going through linked list till u find value, or reach end
-		kvp = kvp->next;
-	}
-	if (strcmp(kvp->key, k) == 0 ){
-		return kvp->val;
 	}
 	return -1;
 }
@@ -109,7 +109,10 @@ struct wc * wc_init(char *word_array, long size)
 
 	const char s[2] = " ";
 	char *word;
-	word = strtok(word_array, s);
+	char * word_array_copy = malloc((size + 1) * sizeof(char)); // strtok modifies string so make copy
+	strcpy(word_array_copy, word_array);
+	word = strtok(word_array_copy, s);
+
 	while (word != NULL) {
 		if (add_kvp(ht, word, 1) == -1){ // already exists in table
 			int curr_count = get_kvp_value(ht, word);
@@ -122,7 +125,7 @@ struct wc * wc_init(char *word_array, long size)
 		}
 		word = strtok(NULL, s); // Subsequent calls with NULL
     }
-
+	free(word_array_copy);
 	return wc;
 }
 
