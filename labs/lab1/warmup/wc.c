@@ -107,13 +107,22 @@ struct wc * wc_init(char *word_array, long size)
 	ht->kvp_arr = (struct key_val_pair*)calloc(ht->size, sizeof(struct key_val_pair)); // defaults all to zero 
 	wc->ht = ht;
 
-	const char s[2] = " ";
-	char *word;
-	char * word_array_copy = malloc((size + 1) * sizeof(char)); // strtok modifies string so make copy
-	strcpy(word_array_copy, word_array);
-	word = strtok(word_array_copy, s);
+	const char *p = word_array;
+	const char delims[] = " \n\t\r\v\f"; // all chars caught by isspace()
+	while (*p) {
+		p += strspn(p, delims); // return 0 if no delimiters found, else returns index of first non-delimiter
+		const char *start = p;
+        p += strcspn(p, delims); //  returns strlen if no delimiters found, else returns index of first delimiter
 
-	while (word != NULL) {
+        unsigned int len = p - start;
+        if (len <= 0) {
+			continue; // no word found
+		}
+            
+		char * word = (char *)malloc((len + 1) * sizeof(char));
+		memcpy(word, start, len);
+        word[len] = '\0';
+
 		if (add_kvp(ht, word, 1) == -1){ // already exists in table
 			int curr_count = get_kvp_value(ht, word);
 			change_kvp_value(ht, word, curr_count + 1);
@@ -123,9 +132,7 @@ struct wc * wc_init(char *word_array, long size)
 			wc->words[wc->wc_size - 1] = malloc((strlen(word) + 1) * sizeof(char));
 			strcpy(wc->words[wc->wc_size - 1], word);
 		}
-		word = strtok(NULL, s); // Subsequent calls with NULL
     }
-	free(word_array_copy);
 	return wc;
 }
 
